@@ -1,6 +1,8 @@
 services:
   backend:
     image: ml-classification-backend
+    volumes:
+      - ./trained_model_complete.pth:/app/trained_model_complete.pth
     build:
       context: ./
       dockerfile: Dockerfile

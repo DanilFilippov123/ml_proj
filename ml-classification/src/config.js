@@ -1,2 +1,2 @@
 export const api_host = "localhost:8000";
-export const api_prefix = "";
+export const api_prefix = "api/";

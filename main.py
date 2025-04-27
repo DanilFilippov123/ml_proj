@@ -11,8 +11,10 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
 from torchvision import models
+from fastapi import APIRouter
 
-app = FastAPI()
+app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+router = APIRouter(prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Разрешает все домены
@@ -58,7 +60,7 @@ def load_custom_model(model_path, device='cpu'):
     return model, checkpoint
 
 
-model, config = load_custom_model("/home/danil/Documents/python/neuro/trained_model_complete.pth")
+model, config = load_custom_model("./trained_model_complete.pth")
 
 
 # with rasterio.open('/home/danil/Documents/python/neuro/Images/Images/0a0d9b30-4304-4765-b9d5-1a5cfc6de7fd.tiff') as src:
@@ -82,7 +84,7 @@ def prepare_image(image, content_type):
     return image
 
 
-@app.post("/convert/tiff")
+@router.post("/convert/tiff")
 async def convert_tiff_to_png(file: UploadFile = File(...)):
     tiff_data = await file.read()
 
@@ -100,7 +102,7 @@ async def convert_tiff_to_png(file: UploadFile = File(...)):
         return StreamingResponse(img_byte_arr, media_type="image/png", headers={"Content-Disposition": "attachment; filename=converted.png"})
 
 
-@app.post("/upload")
+@router.post("/upload")
 async def upload_image(image: UploadFile = File(...)):
     try:
         # Чтение изображения
@@ -121,7 +123,7 @@ async def upload_image(image: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=400, content={"message": str(e)})
 
-
+app.include_router(router)
 if __name__ == "__main__":
     import uvicorn
 

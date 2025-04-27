@@ -2,11 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY ./trained_model_complete.pth /app/trained_model_complete.pth
-COPY ./main.py /app/main.py
 COPY ./requirements.txt /app/requirements.txt
-
 RUN pip install --no-cache-dir -r requirements.txt
+
+RUN apt update && apt install libexpat1
+RUN pip install python-multipart
+RUN ls /app
+COPY ./main.py /app/main.py
 
 EXPOSE 8000
 
